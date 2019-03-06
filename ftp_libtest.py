@@ -1,4 +1,4 @@
-from ftplib import FTP
+ from ftplib import FTP
 import time
 from dateutil import parser
 
@@ -43,6 +43,24 @@ class FTPsession():
             handle.close()
             return False
         return True
+    
+    def is_dir_exist(self,dir = ''):
+        filelist = []
+        self.ftp.retrlines('LIST',filelist.append)
+        for f in filelist:
+            if f.split()[-1] == dir and f.upper().startswith('D'):
+                return True
+    
+    def create_dir_in_ftp_server(self, dir='upload_folder'):
+        if not self.is_dir_exist (dir):
+            self.ftp.mkd('upload_folder')
+        self.ftp.cwd(dir)
+
+    def upload_files_cwd(self, file_name, file_path):
+        self.ftp.storbinary('STOR ' + file_name, open(file_path,'rb') )
+        
+    
+        
         
             
 if  __name__=='__main__':
