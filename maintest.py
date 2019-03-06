@@ -1,4 +1,4 @@
-from ftp_lib import FTPsession
+ from ftp_lib import FTPsession
 import shutil
 import threading
 import time
@@ -21,7 +21,7 @@ class ftpTask (threading.Thread):
         latest_file = ftp1.get_latest_file_name()
         # Not needed for the first time
         rmtar = 'rm -rf /opt/' + self.name + '/*'
-        if not os.path.exists('/opt/' + self.name):
+        if os.path.exists('/opt/' + self.name):
             result = subprocess.check_output(rmtar, shell=True)
             print(result)
         if(ftp1.download_latest_file()):
@@ -34,6 +34,16 @@ class ftpTask (threading.Thread):
             untarcmd = 'tar -xvf ' + dpath + '/*.tar* -C /opt/' + self.name + '/'
             result = subprocess.check_output(untarcmd, shell=True)
             print(result)
+            ftp1.create_dir_in_ftp_server()
+            ft = None
+            for files in  os.walk(dpath):
+                ft = files
+            print(ft)
+            if ft:
+                for item in  ft[2]:
+                    item_path =  dpath + '/' + item
+                    print(item_path)
+                    ftp1.upload_files_cwd(item,item_path)
         else:
             #Send out the mail we should return an error
             print("File Download Fails..")
